@@ -1,24 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import { React, useState, useEffect } from 'react';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import AuthUser from './service/AuthUser';
+import Navi from './layout/Navi';
+import Home from './pages/Home';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import ForgotPass from './pages/ForgotPass';
+import NotFound from './pages/NotFound';
 
 function App() {
+  const [hasToken, setHasToken] = useState(false);
+  useEffect(() => {
+    const token = AuthUser.getUserAuthToken();
+    if (token) {
+      setHasToken(true);
+    }
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      {hasToken ? <Navi /> : null}
+      <Routes>
+        <Route
+          path="/"
+          element={hasToken ? <Home /> : <Navigate to="/signin" />}
+        />
+        <Route
+          path="/signin"
+          element={hasToken ? <Navigate to="/" /> : <SignIn />}
+        />
+        <Route
+          path="/signup"
+          element={hasToken ? <Navigate to="/" /> : <SignUp />}
+        />
+        <Route
+          path="/forgotpass"
+          element={hasToken ? <Navigate to="/" /> : <ForgotPass />}
+        />
+        <Route path="/*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
